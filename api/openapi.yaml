@@ -1,0 +1,2584 @@
+openapi: 3.0.3
+info:
+  contact:
+    email: developers@lucca.fr
+    name: Timmi Absences
+    url: https://www.lucca.fr
+  description: Welcome on the documentation for Timmi Absences API.
+  title: Timmi Absences API
+  version: "1.0"
+  x-konfig-ignore:
+    object-with-no-properties: true
+    potential-incorrect-type: true
+  x-konfig-has-globally-required-security: true
+  x-konfig-uses-multipart-form-data: true
+servers:
+- description: Your production environment (France)
+  url: https://example.ilucca.net
+- description: Your test environment (France)
+  url: https://example.ilucca-test.net
+security:
+- Authorization: []
+tags:
+- description: Absences imports
+  name: Imports
+- description: Workflow object for submiting an absence.
+  name: Leave Requests
+- description: Absences taken on a given day
+  name: Leaves
+paths:
+  /api/v3/leaves:
+    get:
+      description: "Retrieve a list of approved leaves for one or several users on\
+        \ a given period.\n\nThe `leavePeriod.ownerId` query parameter is required\
+        \ ans is used to: \n\n- retrieve Leaves of a specific user: `?leavePeriod.ownerId=5`\n\
+        - retrieve Leaves of several users: `?leavePeriod.ownerId=5,6`\n- retrieve\
+        \ Leaves of a specific group of users: `?leavePeriod.owner.departmentId=3`\n\
+        \nThe\_`date`\_query parameter can operate comparisons with a given date-time\
+        \ value:\n\n- `?date=2021-01-01`: strict equality.\n- `?date=since,2021-01-01`:\
+        \ greater than or equal.\n- `?date=until,2021-01-01`: lower than or equal.\n\
+        - `?date=between,2021-01-01,2021-01-31`: comprised between two dates."
+      operationId: Leaves_getApprovedList
+      parameters:
+      - description: "{offset},{limit}. Defaults to 0,1000."
+        explode: true
+        in: query
+        name: paging
+        required: true
+        schema:
+          example: "100,0"
+          type: string
+          x-konfig-original-example: "100,0"
+          x-konfig-generated-schema: konfig-generated-schema-components-parameters-Timmi-Timesheet-v3_Paging-schema
+        style: form
+      - explode: true
+        in: query
+        name: leaveAccountId
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Employee's identifier
+        explode: true
+        in: query
+        name: leavePeriod.ownerId
+        required: true
+        schema:
+          items:
+            description: "WARNING: Missing items property in array schema. Missing\
+              \ items property has been filled with this AnyType schema."
+          type: array
+        style: form
+      - description: "{comparator},{date-time}"
+        explode: true
+        in: query
+        name: date
+        required: true
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeavesGetApprovedListResponse'
+          description: OK
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: List leaves
+      tags:
+      - Leaves
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--api-v3-leaves
+      x-accepts: application/json
+  /api/v3/leaves/{leaveId}:
+    delete:
+      description: Cancel a single Leave by its unique identifier.
+      operationId: Leaves_cancelLeaveById
+      parameters:
+      - description: Identifier of the leave.
+        explode: false
+        in: path
+        name: leaveId
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+      summary: Cancellation of a leave
+      tags:
+      - Leaves
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-delete--api-v3-leaves-leaveId
+      x-accepts: application/json
+    get:
+      description: Retrieve a single Leave by its unique identifier.
+      operationId: Leaves_getById
+      parameters:
+      - description: Identifier of the leave.
+        explode: false
+        in: path
+        name: leaveId
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeavesGetByIdResponse'
+          description: OK
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Get a leave by id
+      tags:
+      - Leaves
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--api-v3-leaves-leaveId
+      x-accepts: application/json
+  /api/v3/leaveRequests:
+    get:
+      description: Retrieve a list of Leave Requests
+      operationId: LeaveRequests_list
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeaveRequestsListResponse'
+          description: OK
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: List leave requests
+      tags:
+      - Leave Requests
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--api-v3-leaveRequests
+      x-accepts: application/json
+  /api/v3/leaveRequests/{leaveRequestId}:
+    delete:
+      description: Request to cancel a single Leave Request by its unique identifier
+      operationId: LeaveRequests_cancelRequest
+      parameters:
+      - explode: false
+        in: path
+        name: leaveRequestId
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+      summary: Request to cancel a leave request
+      tags:
+      - Leave Requests
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-delete--api-v3-leaveRequests-leaveRequestId
+      x-accepts: application/json
+    get:
+      description: Retrieve a single Leave Request by its unique identifier
+      operationId: LeaveRequests_getById
+      parameters:
+      - explode: false
+        in: path
+        name: leaveRequestId
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              examples: {}
+              schema:
+                $ref: '#/components/schemas/LeaveRequestsGetByIdResponse'
+          description: OK
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Get a leave request by id
+      tags:
+      - Leave Requests
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--api-v3-leaveRequests-leaveRequestId
+      x-accepts: application/json
+  /api/v3/leaveRequests/{leaveRequestId}/approvals:
+    post:
+      description: |
+        Approve or deny a single Leave Request by its unique identifier
+
+        Only the Leave Requests pending approval can be approved or denied.
+
+        A comment is required to deny a Leave Request.
+      operationId: LeaveRequests_approveDeny
+      parameters:
+      - explode: false
+        in: path
+        name: leaveRequestId
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            examples:
+              example:
+                value:
+                  approved: false
+                  comment: your presence is required at the working meeting
+              x-konfig-original-example:
+                value:
+                  approved: false
+                  comment: your presence is required at the working meeting
+            schema:
+              $ref: '#/components/schemas/LeaveRequestsApproveDenyRequest'
+      responses:
+        "200":
+          description: OK
+      summary: Approve or deny a leave request
+      tags:
+      - Leave Requests
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--api-v3-leaveRequests-leaveRequestId-approvals
+      x-content-type: application/json
+      x-accepts: application/json
+  /figgo/api/public/services/v1.0/leaveEntitlementsImport:
+    post:
+      deprecated: true
+      description: |
+        **Supported file formats:**
+        - CSV
+          - "UTF-8" encoding
+          - separator “;”
+        - XSLX
+
+        **Columns to fill in:**
+
+        Column name | Description
+        --- | ---
+        LegalEntityCode | Employee legal entity code
+        EmployeeNumber | Employee payroll number
+        LastName | Last name
+        FirstName | First name
+        Account number or name (one column per account) | Value to import for the account defined in the header.
+
+
+        *Remark:
+        A template file can be downloaded from the import page (Credit / Debit> A group of collaborators> File import).*
+
+        In the event of a malformed (or unrecognized) file, no data will be imported; the problems detected will be specified in the `globalErrors` field.
+
+        If successful, the number of imported lines is indicated by the “successLinesCount” field; the lines in error are detailed in the `lineErrors` field.
+
+
+        *Remarks:
+        Any import made by the API is of course available in the import history.
+        A simulation returns the same level of information, but does not trigger an import*
+
+        **List of errors handled**
+
+        Here is the list of fatal errors, which can be returned in the `globalErrors`:
+        - Unauthorized
+        - FileEmpty,
+        - FileExtensionNotSupported,
+        - ColumnsFormatNotSupported,
+        - AccountColumnMissing,
+        - ColumnNamesDistinct,
+        - LineErrorForbiddenInStrictMode,
+
+        The list of line processing errors, which can be restored in the `lineErrors`:
+        - AccountNotFound,
+        - AccountsNotFound,
+        - AccountColumnsProcessing,
+        - LegalEntityCodesNotFound,
+        - MissingValuesForAccount,
+        - AccountNotAvailableForUser,
+        - LegalEntityCodeRequired,
+        - EmployeeNumberRequired,
+        - LoginRequired,
+        - LoginNotFound,
+        - AccountNumberRequired,
+        - LegalEntityNotFound,
+        - EmployeeNumberNotExist,
+        - EmployeeNumberNotInLegalEntity,
+        - FistNameAndLastNameNotMatching,
+        - FistNameNotMatching,
+        - LastLameNotMatching,
+        - FistNameAndLastNameNotMatchingEmployeeNumber,
+        - FistNameNotMatchingEmployeeNumber,
+        - LastLameNotMatchingEmployeeNumber,
+        - FistNameAndLastNameNotMatchingLogin,
+        - FistNameNotMatchingLogin,
+        - LastLameNotMatchingLogin,
+        - DuplicatedLine,
+        - AmbiguousLegalEntity,
+        - ColumnNotExists,
+        - LegalEntityNameNotAvailable,
+        - AccountNameNotUnique
+
+        The list of import generation errors:
+        - UnableToCreditAccount
+      operationId: Imports_entitlementsBatchImport
+      parameters:
+      - description: "In strict mode, if the import has errors, nothing is imported.\
+          \ Without strict mode, the lines in error are ignored and those in success\
+          \ are imported."
+        explode: true
+        in: query
+        name: strict
+        required: false
+        schema:
+          default: false
+          example: false
+          type: boolean
+          x-konfig-original-example: false
+          x-konfig-generated-schema: konfig-generated-schema-paths--figgo-api-public-services-v1.0-leaveEntitlementsImport-post-parameters-0-schema
+        style: form
+      - description: "Allows you to simulate the import. In this case, the response\
+          \ indicates the theoretical result of the import without any data being\
+          \ recorded."
+        explode: true
+        in: query
+        name: simulate
+        required: false
+        schema:
+          default: false
+          example: false
+          type: boolean
+          x-konfig-original-example: false
+          x-konfig-generated-schema: konfig-generated-schema-paths--figgo-api-public-services-v1.0-leaveEntitlementsImport-post-parameters-1-schema
+        style: form
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ImportsEntitlementsBatchImportRequest'
+        description: ""
+      responses:
+        "200":
+          content:
+            application/json:
+              examples:
+                ImportResponse:
+                  value:
+                    successLinesCount: 0
+                    globalErrors:
+                      columnsFormatNotSupported: "The file must have columns 'login,\
+                        \ lastName, firstName' or 'code, employeeNumber, lastName,\
+                        \ firstName'."
+                    lineErrors:
+                      "7":
+                        loginNotFound: User login not found
+                      "8":
+                        duplicatedLine: Line 8 is identical to line 23
+                      "9":
+                        lastLameNotMatchingLogin: Lastname does not match to the login
+                          of this employee
+                        accountNotAvailableForUser: The user does not have access
+                          to the account 6
+              schema:
+                $ref: '#/components/schemas/ImportsEntitlementsBatchImportResponse'
+          description: Example response
+      summary: Import entitlements (deprecated)
+      tags:
+      - Imports
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--figgo-api-public-services-v1.0-leaveEntitlementsImport
+      x-content-type: multipart/form-data
+      x-accepts: application/json
+  /timmi-absences/api/public/services/v1.0/leaveEntitlementsImport:
+    post:
+      description: |
+        **Supported file formats:**
+        - CSV
+          - "UTF-8" encoding
+          - separator “;”
+        - XSLX
+
+        **Columns to fill in:**
+
+        Column name | Description
+        --- | ---
+        LegalEntityCode | Employee legal entity code
+        EmployeeNumber | Employee payroll number
+        LastName | Last name
+        FirstName | First name
+        Account number or name (one column per account) | Value to import for the account defined in the header.
+
+
+        *Remark:
+        A template file can be downloaded from the import page (Credit / Debit> A group of collaborators> File import).*
+
+        In the event of a malformed (or unrecognized) file, no data will be imported; the problems detected will be specified in the `globalErrors` field.
+
+        If successful, the number of imported lines is indicated by the “successLinesCount” field; the lines in error are detailed in the `lineErrors` field.
+
+
+        *Remarks:
+        Any import made by the API is of course available in the import history.
+        A simulation returns the same level of information, but does not trigger an import*
+
+        **List of errors handled**
+
+        Here is the list of fatal errors, which can be returned in the `globalErrors`:
+        - Unauthorized
+        - FileEmpty,
+        - FileExtensionNotSupported,
+        - ColumnsFormatNotSupported,
+        - AccountColumnMissing,
+        - ColumnNamesDistinct,
+        - LineErrorForbiddenInStrictMode,
+
+        The list of line processing errors, which can be restored in the `lineErrors`:
+        - AccountNotFound,
+        - AccountsNotFound,
+        - AccountColumnsProcessing,
+        - LegalEntityCodesNotFound,
+        - MissingValuesForAccount,
+        - AccountNotAvailableForUser,
+        - LegalEntityCodeRequired,
+        - EmployeeNumberRequired,
+        - LoginRequired,
+        - LoginNotFound,
+        - AccountNumberRequired,
+        - LegalEntityNotFound,
+        - EmployeeNumberNotExist,
+        - EmployeeNumberNotInLegalEntity,
+        - FistNameAndLastNameNotMatching,
+        - FistNameNotMatching,
+        - LastLameNotMatching,
+        - FistNameAndLastNameNotMatchingEmployeeNumber,
+        - FistNameNotMatchingEmployeeNumber,
+        - LastLameNotMatchingEmployeeNumber,
+        - FistNameAndLastNameNotMatchingLogin,
+        - FistNameNotMatchingLogin,
+        - LastLameNotMatchingLogin,
+        - DuplicatedLine,
+        - AmbiguousLegalEntity,
+        - ColumnNotExists,
+        - LegalEntityNameNotAvailable,
+        - AccountNameNotUnique
+
+        The list of import generation errors:
+        - UnableToCreditAccount
+      operationId: Imports_importLeaveEntitlements
+      parameters:
+      - description: "In strict mode, if the import has errors, nothing is imported.\
+          \ Without strict mode, the lines in error are ignored and those in success\
+          \ are imported."
+        explode: true
+        in: query
+        name: strict
+        required: false
+        schema:
+          default: false
+          example: false
+          type: boolean
+          x-konfig-original-example: false
+          x-konfig-generated-schema: konfig-generated-schema-paths--timmi-absences-api-public-services-v1.0-leaveEntitlementsImport-post-parameters-0-schema
+        style: form
+      - description: "Allows you to simulate the import. In this case, the response\
+          \ indicates the theoretical result of the import without any data being\
+          \ recorded."
+        explode: true
+        in: query
+        name: simulate
+        required: false
+        schema:
+          default: false
+          example: false
+          type: boolean
+          x-konfig-original-example: false
+          x-konfig-generated-schema: konfig-generated-schema-paths--timmi-absences-api-public-services-v1.0-leaveEntitlementsImport-post-parameters-1-schema
+        style: form
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ImportsImportLeaveEntitlementsRequest'
+        description: ""
+      responses:
+        "200":
+          content:
+            application/json:
+              examples:
+                ImportResponse:
+                  value:
+                    successLinesCount: 0
+                    globalErrors:
+                      columnsFormatNotSupported: "The file must have columns 'login,\
+                        \ lastName, firstName' or 'code, employeeNumber, lastName,\
+                        \ firstName'."
+                    lineErrors:
+                      "7":
+                        loginNotFound: User login not found
+                      "8":
+                        duplicatedLine: Line 8 is identical to line 23
+                      "9":
+                        lastLameNotMatchingLogin: Lastname does not match to the login
+                          of this employee
+                        accountNotAvailableForUser: The user does not have access
+                          to the account 6
+              schema:
+                $ref: '#/components/schemas/ImportsEntitlementsBatchImportResponse'
+          description: Example response
+      summary: Import entitlements
+      tags:
+      - Imports
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--timmi-absences-api-public-services-v1.0-leaveEntitlementsImport
+      x-content-type: multipart/form-data
+      x-accepts: application/json
+  /figgo/api/public/services/v1.0/leaveEntitlementsReplace:
+    post:
+      deprecated: true
+      description: |
+        **Supported file formats:**
+        - CSV
+          - "UTF-8" encoding
+          - separator “;”
+        - XSLX
+
+        **Columns to fill in:**
+
+        Column name | Description
+        --- | ---
+        LegalEntityCode | Employee legal entity code
+        EmployeeNumber | Employee payroll number
+        LastName | Last name
+        FirstName | First name
+        Account number or name (one column per account) | Value to import for the account defined in the header.
+
+
+        *Remark:
+        A template file can be downloaded from the import page (Credit / Debit> A group of collaborators> File import).*
+
+        In the event of a malformed (or unrecognized) file, no data will be imported; the problems detected will be specified in the `globalErrors` field.
+
+        If successful, the number of imported lines is indicated by the “successLinesCount” field; the lines in error are detailed in the `lineErrors` field.
+
+
+        *Remarks:
+        Any import made by the API is of course available in the import history.
+        A simulation returns the same level of information, but does not trigger an import*
+
+        **List of errors handled**
+
+        Here is the list of fatal errors, which can be returned in the `globalErrors`:
+        - Unauthorized
+        - FileEmpty,
+        - FileExtensionNotSupported,
+        - ColumnsFormatNotSupported,
+        - AccountColumnMissing,
+        - ColumnNamesDistinct,
+        - LineErrorForbiddenInStrictMode,
+
+        The list of line processing errors, which can be restored in the `lineErrors`:
+        - AccountNotFound,
+        - AccountsNotFound,
+        - AccountColumnsProcessing,
+        - LegalEntityCodesNotFound,
+        - MissingValuesForAccount,
+        - AccountNotAvailableForUser,
+        - LegalEntityCodeRequired,
+        - EmployeeNumberRequired,
+        - LoginRequired,
+        - LoginNotFound,
+        - AccountNumberRequired,
+        - LegalEntityNotFound,
+        - EmployeeNumberNotExist,
+        - EmployeeNumberNotInLegalEntity,
+        - FistNameAndLastNameNotMatching,
+        - FistNameNotMatching,
+        - LastLameNotMatching,
+        - FistNameAndLastNameNotMatchingEmployeeNumber,
+        - FistNameNotMatchingEmployeeNumber,
+        - LastLameNotMatchingEmployeeNumber,
+        - FistNameAndLastNameNotMatchingLogin,
+        - FistNameNotMatchingLogin,
+        - LastLameNotMatchingLogin,
+        - DuplicatedLine,
+        - AmbiguousLegalEntity,
+        - ColumnNotExists,
+        - LegalEntityNameNotAvailable,
+        - AccountNameNotUnique
+
+        The list of import generation errors:
+        - UnableToCreditAccount
+      operationId: Imports_replaceEntitlements
+      parameters:
+      - description: "In strict mode, if the import has errors, nothing is imported.\
+          \ Without strict mode, the lines in error are ignored and those in success\
+          \ are imported."
+        explode: true
+        in: query
+        name: strict
+        required: false
+        schema:
+          default: false
+          example: false
+          type: boolean
+          x-konfig-original-example: false
+          x-konfig-generated-schema: konfig-generated-schema-paths--figgo-api-public-services-v1.0-leaveEntitlementsReplace-post-parameters-0-schema
+        style: form
+      - description: "Allows you to simulate the import. In this case, the response\
+          \ indicates the theoretical result of the import without any data being\
+          \ recorded."
+        explode: true
+        in: query
+        name: simulate
+        required: false
+        schema:
+          default: false
+          example: false
+          type: boolean
+          x-konfig-original-example: false
+          x-konfig-generated-schema: konfig-generated-schema-paths--figgo-api-public-services-v1.0-leaveEntitlementsReplace-post-parameters-1-schema
+        style: form
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ImportsReplaceEntitlementsRequest'
+        description: ""
+      responses:
+        "200":
+          content:
+            application/json:
+              examples:
+                ImportResponse:
+                  value:
+                    successLinesCount: 0
+                    globalErrors:
+                      columnsFormatNotSupported: "The file must have columns 'login,\
+                        \ lastName, firstName' or 'code, employeeNumber, lastName,\
+                        \ firstName'."
+                    lineErrors:
+                      "7":
+                        loginNotFound: User login not found
+                      "8":
+                        duplicatedLine: Line 8 is identical to line 23
+                      "9":
+                        lastLameNotMatchingLogin: Lastname does not match to the login
+                          of this employee
+                        accountNotAvailableForUser: The user does not have access
+                          to the account 6
+              schema:
+                $ref: '#/components/schemas/ImportsEntitlementsBatchImportResponse'
+          description: Example response
+      summary: Replace entitlements (deprecated)
+      tags:
+      - Imports
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--figgo-api-public-services-v1.0-leaveEntitlementsReplace
+      x-content-type: multipart/form-data
+      x-accepts: application/json
+  /timmi-absences/api/public/services/v1.0/leaveEntitlementsReplace:
+    post:
+      description: |
+        **Supported file formats:**
+        - CSV
+          - "UTF-8" encoding
+          - separator “;”
+        - XSLX
+
+        **Columns to fill in:**
+
+        Column name | Description
+        --- | ---
+        LegalEntityCode | Employee legal entity code
+        EmployeeNumber | Employee payroll number
+        LastName | Last name
+        FirstName | First name
+        Account number or name (one column per account) | Value to import for the account defined in the header.
+
+
+        *Remark:
+        A template file can be downloaded from the import page (Credit / Debit> A group of collaborators> File import).*
+
+        In the event of a malformed (or unrecognized) file, no data will be imported; the problems detected will be specified in the `globalErrors` field.
+
+        If successful, the number of imported lines is indicated by the “successLinesCount” field; the lines in error are detailed in the `lineErrors` field.
+
+
+        *Remarks:
+        Any import made by the API is of course available in the import history.
+        A simulation returns the same level of information, but does not trigger an import*
+
+        **List of errors handled**
+
+        Here is the list of fatal errors, which can be returned in the `globalErrors`:
+        - Unauthorized
+        - FileEmpty,
+        - FileExtensionNotSupported,
+        - ColumnsFormatNotSupported,
+        - AccountColumnMissing,
+        - ColumnNamesDistinct,
+        - LineErrorForbiddenInStrictMode,
+
+        The list of line processing errors, which can be restored in the `lineErrors`:
+        - AccountNotFound,
+        - AccountsNotFound,
+        - AccountColumnsProcessing,
+        - LegalEntityCodesNotFound,
+        - MissingValuesForAccount,
+        - AccountNotAvailableForUser,
+        - LegalEntityCodeRequired,
+        - EmployeeNumberRequired,
+        - LoginRequired,
+        - LoginNotFound,
+        - AccountNumberRequired,
+        - LegalEntityNotFound,
+        - EmployeeNumberNotExist,
+        - EmployeeNumberNotInLegalEntity,
+        - FistNameAndLastNameNotMatching,
+        - FistNameNotMatching,
+        - LastLameNotMatching,
+        - FistNameAndLastNameNotMatchingEmployeeNumber,
+        - FistNameNotMatchingEmployeeNumber,
+        - LastLameNotMatchingEmployeeNumber,
+        - FistNameAndLastNameNotMatchingLogin,
+        - FistNameNotMatchingLogin,
+        - LastLameNotMatchingLogin,
+        - DuplicatedLine,
+        - AmbiguousLegalEntity,
+        - ColumnNotExists,
+        - LegalEntityNameNotAvailable,
+        - AccountNameNotUnique
+
+        The list of import generation errors:
+        - UnableToCreditAccount
+      operationId: Imports_replaceEntitlements
+      parameters:
+      - description: "In strict mode, if the import has errors, nothing is imported.\
+          \ Without strict mode, the lines in error are ignored and those in success\
+          \ are imported."
+        explode: true
+        in: query
+        name: strict
+        required: false
+        schema:
+          default: false
+          example: false
+          type: boolean
+          x-konfig-original-example: false
+          x-konfig-generated-schema: konfig-generated-schema-paths--timmi-absences-api-public-services-v1.0-leaveEntitlementsReplace-post-parameters-0-schema
+        style: form
+      - description: "Allows you to simulate the import. In this case, the response\
+          \ indicates the theoretical result of the import without any data being\
+          \ recorded."
+        explode: true
+        in: query
+        name: simulate
+        required: false
+        schema:
+          default: false
+          example: false
+          type: boolean
+          x-konfig-original-example: false
+          x-konfig-generated-schema: konfig-generated-schema-paths--timmi-absences-api-public-services-v1.0-leaveEntitlementsReplace-post-parameters-1-schema
+        style: form
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ImportsReplaceEntitlementsRequest1'
+        description: ""
+      responses:
+        "200":
+          content:
+            application/json:
+              examples:
+                ImportResponse:
+                  value:
+                    successLinesCount: 0
+                    globalErrors:
+                      columnsFormatNotSupported: "The file must have columns 'login,\
+                        \ lastName, firstName' or 'code, employeeNumber, lastName,\
+                        \ firstName'."
+                    lineErrors:
+                      "7":
+                        loginNotFound: User login not found
+                      "8":
+                        duplicatedLine: Line 8 is identical to line 23
+                      "9":
+                        lastLameNotMatchingLogin: Lastname does not match to the login
+                          of this employee
+                        accountNotAvailableForUser: The user does not have access
+                          to the account 6
+              schema:
+                $ref: '#/components/schemas/ImportsEntitlementsBatchImportResponse'
+          description: Example response
+      summary: Replace entitlements
+      tags:
+      - Imports
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--timmi-absences-api-public-services-v1.0-leaveEntitlementsReplace
+      x-content-type: multipart/form-data
+      x-accepts: application/json
+  /api/v3/services/importLeavePeriods:
+    post:
+      deprecated: true
+      description: "Create absences in batch from a CSV file.\n\n**Important notice:\
+        \ Absence imports cannot be cancelled.** \n\nIn case of a mistake absences\
+        \ must be deleted manually through the interface or using the API (see Use\
+        \ cases). **Use import with care!**\n\n\n**File format**\n\nType: CSV (with\
+        \ semicolon \";\")\n\nEncoding: UTF-8\n\n\nAll the following fields must be\
+        \ present with the field name in the header:\n\n- legalEntity : establishment\
+        \ of the employee\n- employeeNumber : employee number\n- lastName : last name\
+        \ of the employee\n- firstName : firstname of the employee\n- accountId :\
+        \ absence account id in Timmi Absences (you can find it in the leave accounts\
+        \ admin page)\n- startDate : absence start date (DD/MM/YYYY)\n- flagStartDate\
+        \ : AM (if the absences starts in the morning) or PM (if the absence starts\
+        \ in the afternoon)\n- endDate : absence end date (DD/MM/YYYY)\n- flagEndDate\
+        \ : AM (if the absences ends at noon) or PM (if the absences ends in the afternoon)\n\
+        - isApproved : yes or no. Compulsory if the absence type is subject to approval,\
+        \ optional otherwise.\n\n**History**\nImport history is available in the import\
+        \ module, including imports made using the API.\n"
+      operationId: Imports_absenceBatchCreate
+      parameters:
+      - description: Support CSV files only
+        explode: true
+        in: query
+        name: type
+        required: true
+        schema:
+          default: csv
+          enum:
+          - csv
+          example: csv
+          type: string
+          x-konfig-original-example: csv
+          x-konfig-generated-schema: konfig-generated-schema-paths--api-v3-services-importLeavePeriods-post-parameters-0-schema
+        style: form
+      - description: Use `false` to simulate the import.
+        explode: true
+        in: query
+        name: create
+        required: false
+        schema:
+          default: false
+          example: false
+          type: boolean
+          x-konfig-original-example: false
+          x-konfig-generated-schema: konfig-generated-schema-paths--api-v3-services-importLeavePeriods-post-parameters-1-schema
+        style: form
+      - description: "Use `true` if absences should **not** be deducted from the user\
+          \ balance. Use `false` if absences should be deducted from the user balance.\
+          \ Note: if the absence type doesn’t have balance management, absence won’\
+          t impact the balance in any case."
+        explode: true
+        in: query
+        name: recredit
+        required: false
+        schema:
+          type: boolean
+        style: form
+      - description: Filename
+        explode: true
+        in: query
+        name: originalFileName
+        required: true
+        schema:
+          example: import.csv
+          type: string
+          x-konfig-original-example: import.csv
+          x-konfig-generated-schema: konfig-generated-schema-paths--api-v3-services-importLeavePeriods-post-parameters-3-schema
+        style: form
+      - description: "Use `true` to force synchronization of the absences in the sync\
+          \ webservice (sync to Exchange/0365, Google Calendar, Webhook or ADP GXP,\
+          \ depending on configuration). Use `false` to import absences without synchronizing\
+          \ absences."
+        explode: true
+        in: query
+        name: synchronize
+        required: false
+        schema:
+          type: boolean
+        style: form
+      - description: Use `true` to allow replacing existing absences
+        explode: true
+        in: query
+        name: overrideLeaves
+        required: false
+        schema:
+          type: boolean
+        style: form
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ImportsAbsenceBatchCreateRequest'
+        description: ""
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportsAbsenceBatchCreateResponse'
+          description: OK
+      summary: Import leaves (deprecated)
+      tags:
+      - Imports
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--api-v3-services-importLeavePeriods
+      x-content-type: multipart/form-data
+      x-accepts: application/json
+  /timmi-absences/api/imports/v1.0/leavePeriods:
+    post:
+      description: "Create absences in batch from a CSV file.\n\n**Important notice:\
+        \ Absence imports cannot be cancelled.** \n\nIn case of a mistake absences\
+        \ must be deleted manually through the interface or using the API (see Use\
+        \ cases). **Use import with care!**\n\n**File format**\n\nContent-Type: CSV.\
+        \ Column divider is semicolon \";\". Line breaks between rows.\n\nEncoding:\
+        \ UTF-8\n\nAll the following fields must be present with the field name in\
+        \ the header:\n\n- legalEntity: Name of the establishment the employee belongs\
+        \ to.\n- employeeNumber: Employee number.\n- lastName: Family (last) name\
+        \ of the employee.\n- firstName: Given (first) name of the employee.\n- accountId:\
+        \ Identifier of the absence account in Timmi Absences (can be found in the\
+        \ leave accounts admin page).\n- startDate: Start date of the absence, formatted\
+        \ as `DD/MM/YYYY`.\n- flagStartDate: `\"AM\"` if the absence starts in the\
+        \ morning or `\"PM\"` if the absence starts in the afternoon.\n- endDate:\
+        \ End date of the absence, formatted as `DD/MM/YYYY`.\n- flagEndDate: `\"\
+        AM\"` if the absence ends at noon or `\"PM\"` if the absence ends in the afternoon.\n\
+        - isApproved: `true` or `false`. Dictates whether the absence request should\
+        \ be created and already approved. \n  Required if the type of the absence\
+        \ requires approval, optional otherwise.\n\n**History**\nImport history is\
+        \ available in the import module. It includes imports made via the API.\n"
+      operationId: Imports_createAbsencesBatch
+      parameters:
+      - description: Use `false` to simulate the import.
+        explode: true
+        in: query
+        name: create
+        required: false
+        schema:
+          type: boolean
+        style: form
+      - description: "Use `true` if absences should **not** be deducted from the user\
+          \ balance. Use `false` if absences should be deducted from the user balance.\
+          \ Note: if the absence type doesn’t have balance management, absence won’\
+          t impact the balance in any case."
+        explode: true
+        in: query
+        name: recredit
+        required: false
+        schema:
+          type: boolean
+        style: form
+      - description: Filename
+        explode: true
+        in: query
+        name: originalFileName
+        required: false
+        schema:
+          default: import.csv
+          example: import.csv
+          type: string
+          x-konfig-original-example: import.csv
+          x-konfig-generated-schema: konfig-generated-schema-paths--timmi-absences-api-imports-v1.0-leavePeriods-post-parameters-2-schema
+        style: form
+      - description: "Use `true` to force synchronization of the absences in the sync\
+          \ webservice (sync to Exchange/0365, Google Calendar, Webhook or ADP GXP,\
+          \ depending on configuration). Use `false` to import absences without synchronizing\
+          \ absences."
+        explode: true
+        in: query
+        name: synchronize
+        required: false
+        schema:
+          type: boolean
+        style: form
+      - description: "Use `true` if you want to import absences with the asynchronous\
+          \ processing (you have to request figgo/api/imports/v1.0/leavePeriods/{summaryId}/progress\
+          \ API to track the status). Use `false` if you want import absences with\
+          \ the synchronous processing (the response is sent when the file is fully\
+          \ imported)."
+        explode: true
+        in: query
+        name: async
+        required: false
+        schema:
+          type: boolean
+        style: form
+      requestBody:
+        content:
+          multipart/form-data:
+            encoding:
+              files:
+                contentType: application/vnd.ms-excel
+                style: form
+            schema:
+              $ref: '#/components/schemas/ImportsCreateAbsencesBatchRequest'
+        description: |
+          Content of the CSV file to import. Each file in its dedicated part
+          of the multipart request. Parts are divided by the 'boundary' string
+          set in the Content-Type HTTP header.
+
+          Example of a single file request body:
+          ```
+          --myBoundary
+          Content-Disposition: form-data; name="figgo-import-5875e9dd-0b1f-4a9f-8756-0f25fb0a2946.csv"; filename="figgo-import-5875e9dd-0b1f-4a9f-8756-0f25fb0a2946.csv"
+          Content-Type: application/vnd.ms-excel
+
+          legalEntity;employeeNumber;lastName;firstName;accountId;startDate;flagStartDate;endDate;flagEndDate;isApproved
+          Lucca FR;M0029;Bart;Maurice;1322;16/08/2022;am;17/08/2022;pm;true
+          Lucca FR;M0029;Bart;Maurice;1322;22/08/2022;am;23/08/2022;pm;false
+          Lucca FR;M0029;Bart;Maurice;8;29/08/2022;am;30/08/2022;pm;true
+          --myBoundary--
+          ```
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportsCreateAbsencesBatchResponse'
+          description: OK
+      summary: Import leaves
+      tags:
+      - Imports
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-post--timmi-absences-api-imports-v1.0-leavePeriods
+      x-content-type: multipart/form-data
+      x-accepts: application/json
+  /timmi-absences/api/imports/v1.0/leavePeriods/{summaryId}/progress:
+    get:
+      description: Retrieve the progress of Import leaves API request.
+      operationId: Imports_getProgress
+      parameters:
+      - description: Identifier of the import
+        explode: false
+        in: path
+        name: summaryId
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportsGetProgressResponse'
+          description: OK
+      summary: Get import leaves progress
+      tags:
+      - Imports
+      x-konfig-operation-can-have-single-parameter: true
+      x-konfig-single-parameter-schema: konfig-generated-schema-single-parameter-schema-get--timmi-absences-api-imports-v1.0-leavePeriods-summaryId-progress
+      x-accepts: application/json
+components:
+  parameters:
+    Timmi-Timesheet-v3_Paging:
+      description: "{offset},{limit}. Defaults to 0,1000."
+      explode: true
+      in: query
+      name: paging
+      required: true
+      schema:
+        example: "100,0"
+        type: string
+        x-konfig-original-example: "100,0"
+        x-konfig-generated-schema: konfig-generated-schema-components-parameters-Timmi-Timesheet-v3_Paging-schema
+      style: form
+  responses:
+    ImportResponse:
+      content:
+        application/json:
+          examples:
+            ImportResponse:
+              value:
+                successLinesCount: 0
+                globalErrors:
+                  columnsFormatNotSupported: "The file must have columns 'login, lastName,\
+                    \ firstName' or 'code, employeeNumber, lastName, firstName'."
+                lineErrors:
+                  "7":
+                    loginNotFound: User login not found
+                  "8":
+                    duplicatedLine: Line 8 is identical to line 23
+                  "9":
+                    lastLameNotMatchingLogin: Lastname does not match to the login
+                      of this employee
+                    accountNotAvailableForUser: The user does not have access to the
+                      account 6
+          schema:
+            $ref: '#/components/schemas/ImportsEntitlementsBatchImportResponse'
+      description: Example response
+  schemas:
+    Leave:
+      description: |-
+        Absences from work, wether they are planned or not, are described in Lucca using three concepts : **LeaveRequests**, **LeavePeriods** and **Leaves**.
+
+        A **LeaveRequest** represent the request made by employees when planning time off. This resource is used for workflow purposes.
+
+        A **LeavePeriod** is the continuous period of absence requested by the employee or entered by HR. It is linked to a **LeaveRequest** if workflow applies.
+
+        A **Leave** is the subdivision of a **LeavePeriod**. There is one **Leave** per half-day of the **LeavePeriod**. Each **Leave** is linked to a **LeaveAccount**, which represent the type of leave (PTO, Sick Leave, Congés payés, RTT, etc).
+
+        ![Timmi Absences - UML](https://stoplight.io/api/v1/projects/cHJqOjEwNjgxNg/images/6yaK9GNTQ08)
+
+        There can only be one **Leave** per half-day. This prevents duplicates.
+        For **Leaves** expressed in hours (as opposed to **Leaves** in days), the duration of the **Leave** is stored in the value field of the **Leave**. The previous constraint implies that there can only be one type of **Leave** per half-day. This issue is solved in the next version of the API.
+
+        ## Fields
+      example:
+        date: 2000-01-23
+        cancellationUserId: ""
+        leavePeriodId: 1
+        isAm: true
+        creationDate: 2000-01-23T04:56:07.000+00:00
+        isActive: true
+        leaveAccountId: 0
+        leavePeriod:
+          confirmationDate: ""
+          leaves:
+          - null
+          - null
+          isConfirmed: true
+          id: 5.962133916683182
+          attachmentId: ""
+          ownerId: 5.637376656633329
+          logs:
+          - date: 2000-01-23T04:56:07.000+00:00
+            comment: comment
+            id: 2
+            status: 7.061401241503109
+          - date: 2000-01-23T04:56:07.000+00:00
+            comment: comment
+            id: 2
+            status: 7.061401241503109
+        leaveAccount:
+          name: name
+          id: 6
+        comment: comment
+        id: id
+        value: ""
+        cancellationDate: ""
+      properties:
+        id:
+          description: Unique identifier for the Leave
+          type: string
+        date:
+          description: Date of the leave in ISO format `yyyy-mm-dd`
+          format: date
+          type: string
+        isAm:
+          description: Has the value `true` for morning or the value `false` for afternoon
+          type: boolean
+        leaveAccountId:
+          description: Unique identifier for the attached LeaveAccount
+          type: integer
+        leaveAccount:
+          $ref: '#/components/schemas/LeaveAccount'
+        leavePeriodId:
+          description: Unique identifier for the attached LeavePeriod
+          type: integer
+        leavePeriod:
+          $ref: '#/components/schemas/LeavePeriod'
+        value:
+          description: Leave duration in hours
+          format: duration
+        creationDate:
+          description: Time at which the object was created
+          format: date-time
+          type: string
+        isActive:
+          description: |
+            Has the value `true` when the Leave exists (for pending or confirmed LeavePeriods), or the value `false` when it has been deleted (for canceled or denied LeaveRequests).
+          type: boolean
+        cancellationDate:
+          description: Time at which the request was canceled
+          format: date-time
+        cancellationUserId:
+          default: null
+          description: 'Unique identifier for the user who canceled the request '
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-Leave-properties-cancellationUserId
+          example: null
+        comment:
+          description: Comments
+          type: string
+      required:
+      - date
+      - id
+      - isAm
+      - leaveAccountId
+      - leavePeriodId
+      title: The Leave resource
+      type: object
+      x-tags:
+      - Leaves
+    LeavePeriod:
+      description: "Absences from work, wether they are planned or not, are described\
+        \ in Lucca using three concepts : **LeaveRequests**, **LeavePeriods** and\
+        \ **Leaves**.\n\nA **LeaveRequest** represent the request made by employees\
+        \ when planning time off. This resource is used for workflow purposes.\n\n\
+        A **LeavePeriod** is the continuous period of absence requested by the employee\
+        \ or entered by HR. It is linked to a **LeaveRequest** if workflow applies.\n\
+        \nA **Leave** is the subdivision of a **LeavePeriod**. There is one **Leave**\
+        \ per half-day of the **LeavePeriod**. Each **Leave** is linked to a **LeaveAccount**,\
+        \ which represent the type of leave (PTO, Sick Leave, Congés payés, RTT, etc).\n\
+        \ \n![Timmi Absences - UML](../assets/images/ROunRiCm34LtdeB8M206UeCucG9qABfq9aIs5Y9BBKNPGv6xrrOSH4CcKG-F_F-GZTJA621VVFmXfH5Te9pn3n2Fv2xVcahaKmf9yNFm9YjFog8tTWoBjB1UDSqjkZOd1ueygpUJYAP5OF0iwBow80XmItmJckH3VejaWpK-hE1Tr2S-y_BFHbRoCdHT1zTsRRFgLfgZQFLzFgNuvNKKVhfKTIQJwlRZFR9tBfLePtxIOQ9G.png)\n\
+        \n## Fields"
+      example:
+        confirmationDate: ""
+        leaves:
+        - null
+        - null
+        isConfirmed: true
+        id: 5.962133916683182
+        attachmentId: ""
+        ownerId: 5.637376656633329
+        logs:
+        - date: 2000-01-23T04:56:07.000+00:00
+          comment: comment
+          id: 2
+          status: 7.061401241503109
+        - date: 2000-01-23T04:56:07.000+00:00
+          comment: comment
+          id: 2
+          status: 7.061401241503109
+      properties:
+        id:
+          description: Unique identifier for the LeavePeriod
+          type: number
+        ownerId:
+          description: 'Unique identifier for the user '
+          type: number
+        isConfirmed:
+          description: Has the value `true` for approved LeavePeriod or the value
+            `false` for LeavePeriod pending approval
+          type: boolean
+        confirmationDate:
+          description: Time at which the LeavePeriod was approved
+          format: date-time
+        attachmentId:
+          description: Unique identifier for the attached document
+        leaves:
+          items:
+            $ref: '#/components/schemas/Leave'
+          type: array
+        logs:
+          items:
+            $ref: '#/components/schemas/LeavePeriodLog'
+          type: array
+      title: The LeavePeriod resource
+      type: object
+      x-tags:
+      - Leave Requests
+    LeavePeriodLog:
+      description: '## Fields'
+      example:
+        date: 2000-01-23T04:56:07.000+00:00
+        comment: comment
+        id: 2
+        status: 7.061401241503109
+      properties:
+        id:
+          type: integer
+        date:
+          format: date-time
+          type: string
+        comment:
+          type: string
+        status:
+          description: |
+            - 0 = PENDING_APPROVAL
+            - 2 = APPROVED
+            - 3 = DENIED
+            - 4 = CANCELLED
+            - 5 = CANCELLATION_PENDING
+          enum:
+          - 0
+          - 2
+          - 3
+          - 4
+          - 5
+          type: number
+      title: The LeavePeriodLog resource
+      type: object
+      x-stoplight:
+        id: elwwnh4nqyuhf
+    LeaveRequest:
+      description: |-
+        Absences from work, wether they are planned or not, are described in Lucca using three concepts : **LeaveRequests**, **LeavePeriods** and **Leaves**.
+
+        A **LeaveRequest** represent the request made by employees when planning time off. This resource is used for workflow purposes.
+
+        A **LeavePeriod** is the continuous period of absence requested by the employee or entered by HR. It is linked to a **LeaveRequest** if workflow applies.
+
+        A **Leave** is the subdivision of a **LeavePeriod**. There is one **Leave** per half-day of the **LeavePeriod**. Each **Leave** is linked to a **LeaveAccount**, which represent the type of leave (PTO, Sick Leave, Congés payés, RTT, etc).
+
+        ![Timmi Absences - UML](../assets/images/ROunRiCm34LtdeB8M206UeCucG9qABfq9aIs5Y9BBKNPGv6xrrOSH4CcKG-F_F-GZTJA621VVFmXfH5Te9pn3n2Fv2xVcahaKmf9yNFm9YjFog8tTWoBjB1UDSqjkZOd1ueygpUJYAP5OF0iwBow80XmItmJckH3VejaWpK-hE1Tr2S-y_BFHbRoCdHT1zTsRRFgLfgZQFLzFgNuvNKKVhfKTIQJwlRZFR9tBfLePtxIOQ9G.png)
+
+        **LeaveRequests** status are by default in the `pending_approval` state. **LeaveRequests** status can be `approved`, `denied`, `cancelled` or in the `cancellation_pending` state.
+
+        ## Fields
+      example:
+        cancellationUserId: ""
+        leavePeriod:
+          confirmationDate: ""
+          leaves:
+          - null
+          - null
+          isConfirmed: true
+          id: 5.962133916683182
+          attachmentId: ""
+          ownerId: 5.637376656633329
+          logs:
+          - date: 2000-01-23T04:56:07.000+00:00
+            comment: comment
+            id: 2
+            status: 7.061401241503109
+          - date: 2000-01-23T04:56:07.000+00:00
+            comment: comment
+            id: 2
+            status: 7.061401241503109
+        leavePeriodId: 6
+        approvals:
+        - date: 2000-01-23T04:56:07.000+00:00
+          substitutedApproverId: 2
+          approved: true
+          approverId: 5.637376656633329
+          comment: comment
+          id: 5
+        - date: 2000-01-23T04:56:07.000+00:00
+          substitutedApproverId: 2
+          approved: true
+          approverId: 5.637376656633329
+          comment: comment
+          id: 5
+        cancellationRequests:
+        - approved: true
+          rank: 3.616076749251911
+          comment: comment
+          id: 7
+          authorId: 9
+          creationDate: 2000-01-23T04:56:07.000+00:00
+          isActive: true
+          nextApproverId: ""
+        - approved: true
+          rank: 3.616076749251911
+          comment: comment
+          id: 7
+          authorId: 9
+          creationDate: 2000-01-23T04:56:07.000+00:00
+          isActive: true
+          nextApproverId: ""
+        id: 0
+        creationDate: 2000-01-23T04:56:07.000+00:00
+        isActive: true
+        nextApproverId: ""
+        status: 1.4658129805029452
+        cancellationDate: ""
+      properties:
+        id:
+          description: Unique identifier for the LeaveRequest
+          type: integer
+        leavePeriodId:
+          description: Unique identifier for the attached LeavePeriod
+          format: date-time
+          type: integer
+        leavePeriod:
+          $ref: '#/components/schemas/LeavePeriod'
+        status:
+          description: "Status of the Leave request. Can be : \n\n0 = PENDING_APPROVAL\n\
+            \n2 = APPROVED\n\n3 = DENIED\n\n4 = CANCELLED\n\n5 = CANCELLATION_PENDING\n"
+          enum:
+          - 0
+          - 2
+          - 3
+          - 4
+          - 5
+          type: number
+        creationDate:
+          description: Time at which the object was created
+          format: date-time
+          type: string
+        nextApproverId:
+          description: Unique identifier for the next approver
+        cancellationUserId:
+          description: Unique identifier for the user that cancelled the Leave Request
+        cancellationDate:
+          description: Time at which the object was cancelled
+          format: date-time
+        isActive:
+          description: Has the value `true` for acitve Leave Request or the value
+            `false` for cancelled Leave Request
+          type: boolean
+        approvals:
+          items:
+            $ref: '#/components/schemas/LeaveRequestApproval'
+          type: array
+        cancellationRequests:
+          items:
+            $ref: '#/components/schemas/CancellationRequest'
+          type: array
+      title: The LeaveRequest resource
+      type: object
+      x-tags:
+      - Leave Requests
+    LeaveAccount:
+      description: |-
+        **LeaveAccounts** are the type of absences that can be selected by the user
+
+
+        ## Fields
+      example:
+        name: name
+        id: 6
+      properties:
+        id:
+          description: Unique identifier for the LeaveAccount
+          type: integer
+        name:
+          description: Name of the LeaveAccount
+          type: string
+      title: The LeaveAccount resource
+      type: object
+      x-tags:
+      - Leaves
+    LeaveRequestApproval:
+      description: '## Fields'
+      example:
+        date: 2000-01-23T04:56:07.000+00:00
+        substitutedApproverId: 2
+        approved: true
+        approverId: 5.637376656633329
+        comment: comment
+        id: 5
+      properties:
+        id:
+          description: Unique identifier for the LeaveRequestApproval
+          type: integer
+        date:
+          format: date-time
+          type: string
+        approverId:
+          description: Unique identifier for the approver
+          type: number
+        substitutedApproverId:
+          description: |
+            0 = PENDING_APPROVAL
+
+            2 = APPROVED
+
+            3 = DENIED
+
+            4 = CANCELLED
+
+            5 = CANCELLATION_PENDING
+          enum:
+          - 0
+          - 2
+          - 3
+          - 4
+          - 5
+          type: integer
+        approved:
+          description: Has the value `true` for approved LeaveRequest or the value
+            `false` for LeaveRequest pending approval
+          type: boolean
+        comment:
+          description: Comments
+          type: string
+      title: The LeaveRequestApproval resource
+      type: object
+      x-tags:
+      - Leave Requests
+    CancellationRequest:
+      description: '## Fields'
+      example:
+        approved: true
+        rank: 3.616076749251911
+        comment: comment
+        id: 7
+        authorId: 9
+        creationDate: 2000-01-23T04:56:07.000+00:00
+        isActive: true
+        nextApproverId: ""
+      properties:
+        id:
+          type: integer
+        authorId:
+          type: integer
+        comment:
+          type: string
+        rank:
+          description: |
+            0 = PENDING_APPROVAL
+
+            2 = APPROVED
+
+            3 = DENIED
+
+            4 = CANCELLED
+
+            5 = CANCELLATION_PENDING
+          enum:
+          - 0
+          - 2
+          - 3
+          - 4
+          - 5
+          type: number
+        approved:
+          type: boolean
+        creationDate:
+          format: date-time
+          type: string
+        nextApproverId: {}
+        isActive:
+          type: boolean
+      title: The CancellationRequest resource
+      type: object
+      x-tags:
+      - Leave Requests
+    LeaveRequestsApproveDenyRequest:
+      example:
+        approved: true
+        comment: ""
+      properties:
+        approved:
+          type: boolean
+        comment: {}
+      type: object
+    ImportsEntitlementsBatchImportRequest:
+      properties:
+        File:
+          type: string
+        Description:
+          description: Description of the entries generated by the import (visible
+            to users in the account details).
+          type: string
+        ReferenceDate:
+          description: |-
+            Reference date (text mode).
+            Respect the format: yyyy-MM-ddThh: mm: ss
+          format: date-time
+          type: string
+      type: object
+    ImportsImportLeaveEntitlementsRequest:
+      properties:
+        File:
+          type: string
+        Description:
+          description: Description of the entries generated by the import (visible
+            to users in the account details).
+          type: string
+        ReferenceDate:
+          description: |-
+            Reference date (text mode).
+            Respect the format: yyyy-MM-ddThh: mm: ss
+          format: date-time
+          type: string
+      type: object
+    ImportsReplaceEntitlementsRequest:
+      properties:
+        File:
+          type: string
+        Description:
+          description: Description of the entries generated by the import (visible
+            to users in the account details).
+          type: string
+        ReferenceDate:
+          description: |-
+            Reference date (text mode).
+            Respect the format: yyyy-MM-ddThh: mm: ss
+          format: date-time
+          type: string
+        EntryTypes:
+          default: "AutoAccruals,ManualAccruals,Regularizations"
+          description: |-
+            Types of entries to take into account, separated by commas, from the following list:
+            AutoAccruals,
+            ManualAccruals,
+            Regularisations,
+            EntitlementsImport,
+            Seniority,
+            Fractionnement,
+            TimeSavings,
+            Comp
+
+            By default: `AutoAccruals, ManualAccruals, Regularizations` which correspond to the main cases of acquisition (automatic acquisition, manual adjustments, regularisations).
+          example: "AutoAccruals,ManualAccruals,Regularizations"
+          type: string
+          x-konfig-original-example: "AutoAccruals,ManualAccruals,Regularizations"
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-ImportsReplaceEntitlementsRequest-properties-EntryTypes
+      type: object
+    ImportsReplaceEntitlementsRequest1:
+      properties:
+        File:
+          type: string
+        Description:
+          description: Description of the entries generated by the import (visible
+            to users in the account details).
+          type: string
+        ReferenceDate:
+          description: |-
+            Reference date (text mode).
+            Respect the format: yyyy-MM-ddThh: mm: ss
+          format: date-time
+          type: string
+        EntryTypes:
+          default: "AutoAccruals,ManualAccruals,Regularizations"
+          description: |-
+            Types of entries to take into account, separated by commas, from the following list:
+            AutoAccruals,
+            ManualAccruals,
+            Regularisations,
+            EntitlementsImport,
+            Seniority,
+            Fractionnement,
+            TimeSavings,
+            Comp
+
+            By default: `AutoAccruals, ManualAccruals, Regularizations` which correspond to the main cases of acquisition (automatic acquisition, manual adjustments, regularisations).
+          example: "AutoAccruals,ManualAccruals,Regularizations"
+          type: string
+          x-konfig-original-example: "AutoAccruals,ManualAccruals,Regularizations"
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-ImportsReplaceEntitlementsRequest1-properties-EntryTypes
+      type: object
+    ImportsAbsenceBatchCreateRequest:
+      type: object
+    ImportsCreateAbsencesBatchRequest:
+      properties:
+        files:
+          items:
+            type: string
+          type: array
+      type: object
+    LeavesGetApprovedListResponse:
+      example:
+        data:
+          date: 2000-01-23
+          cancellationUserId: ""
+          leavePeriodId: 1
+          isAm: true
+          creationDate: 2000-01-23T04:56:07.000+00:00
+          isActive: true
+          leaveAccountId: 0
+          leavePeriod:
+            confirmationDate: ""
+            leaves:
+            - null
+            - null
+            isConfirmed: true
+            id: 5.962133916683182
+            attachmentId: ""
+            ownerId: 5.637376656633329
+            logs:
+            - date: 2000-01-23T04:56:07.000+00:00
+              comment: comment
+              id: 2
+              status: 7.061401241503109
+            - date: 2000-01-23T04:56:07.000+00:00
+              comment: comment
+              id: 2
+              status: 7.061401241503109
+          leaveAccount:
+            name: name
+            id: 6
+          comment: comment
+          id: id
+          value: ""
+          cancellationDate: ""
+      properties:
+        data:
+          $ref: '#/components/schemas/Leave'
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    LeavesGetByIdResponse:
+      example:
+        data:
+          date: 2000-01-23
+          cancellationUserId: ""
+          leavePeriodId: 1
+          isAm: true
+          creationDate: 2000-01-23T04:56:07.000+00:00
+          isActive: true
+          leaveAccountId: 0
+          leavePeriod:
+            confirmationDate: ""
+            leaves:
+            - null
+            - null
+            isConfirmed: true
+            id: 5.962133916683182
+            attachmentId: ""
+            ownerId: 5.637376656633329
+            logs:
+            - date: 2000-01-23T04:56:07.000+00:00
+              comment: comment
+              id: 2
+              status: 7.061401241503109
+            - date: 2000-01-23T04:56:07.000+00:00
+              comment: comment
+              id: 2
+              status: 7.061401241503109
+          leaveAccount:
+            name: name
+            id: 6
+          comment: comment
+          id: id
+          value: ""
+          cancellationDate: ""
+      properties:
+        data:
+          $ref: '#/components/schemas/Leave'
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    LeaveRequestsListResponse:
+      example:
+        data:
+          count: 2
+          items:
+          - cancellationUserId: ""
+            leavePeriod:
+              confirmationDate: ""
+              leaves:
+              - null
+              - null
+              isConfirmed: true
+              id: 5.962133916683182
+              attachmentId: ""
+              ownerId: 5.637376656633329
+              logs:
+              - date: 2000-01-23T04:56:07.000+00:00
+                comment: comment
+                id: 2
+                status: 7.061401241503109
+              - date: 2000-01-23T04:56:07.000+00:00
+                comment: comment
+                id: 2
+                status: 7.061401241503109
+            leavePeriodId: 6
+            approvals:
+            - date: 2000-01-23T04:56:07.000+00:00
+              substitutedApproverId: 2
+              approved: true
+              approverId: 5.637376656633329
+              comment: comment
+              id: 5
+            - date: 2000-01-23T04:56:07.000+00:00
+              substitutedApproverId: 2
+              approved: true
+              approverId: 5.637376656633329
+              comment: comment
+              id: 5
+            cancellationRequests:
+            - approved: true
+              rank: 3.616076749251911
+              comment: comment
+              id: 7
+              authorId: 9
+              creationDate: 2000-01-23T04:56:07.000+00:00
+              isActive: true
+              nextApproverId: ""
+            - approved: true
+              rank: 3.616076749251911
+              comment: comment
+              id: 7
+              authorId: 9
+              creationDate: 2000-01-23T04:56:07.000+00:00
+              isActive: true
+              nextApproverId: ""
+            id: 0
+            creationDate: 2000-01-23T04:56:07.000+00:00
+            isActive: true
+            nextApproverId: ""
+            status: 1.4658129805029452
+            cancellationDate: ""
+          - cancellationUserId: ""
+            leavePeriod:
+              confirmationDate: ""
+              leaves:
+              - null
+              - null
+              isConfirmed: true
+              id: 5.962133916683182
+              attachmentId: ""
+              ownerId: 5.637376656633329
+              logs:
+              - date: 2000-01-23T04:56:07.000+00:00
+                comment: comment
+                id: 2
+                status: 7.061401241503109
+              - date: 2000-01-23T04:56:07.000+00:00
+                comment: comment
+                id: 2
+                status: 7.061401241503109
+            leavePeriodId: 6
+            approvals:
+            - date: 2000-01-23T04:56:07.000+00:00
+              substitutedApproverId: 2
+              approved: true
+              approverId: 5.637376656633329
+              comment: comment
+              id: 5
+            - date: 2000-01-23T04:56:07.000+00:00
+              substitutedApproverId: 2
+              approved: true
+              approverId: 5.637376656633329
+              comment: comment
+              id: 5
+            cancellationRequests:
+            - approved: true
+              rank: 3.616076749251911
+              comment: comment
+              id: 7
+              authorId: 9
+              creationDate: 2000-01-23T04:56:07.000+00:00
+              isActive: true
+              nextApproverId: ""
+            - approved: true
+              rank: 3.616076749251911
+              comment: comment
+              id: 7
+              authorId: 9
+              creationDate: 2000-01-23T04:56:07.000+00:00
+              isActive: true
+              nextApproverId: ""
+            id: 0
+            creationDate: 2000-01-23T04:56:07.000+00:00
+            isActive: true
+            nextApproverId: ""
+            status: 1.4658129805029452
+            cancellationDate: ""
+      properties:
+        data:
+          $ref: '#/components/schemas/LeaveRequestsListResponse_data'
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    LeaveRequestsGetByIdResponse:
+      example:
+        data:
+          cancellationUserId: ""
+          leavePeriod:
+            confirmationDate: ""
+            leaves:
+            - null
+            - null
+            isConfirmed: true
+            id: 5.962133916683182
+            attachmentId: ""
+            ownerId: 5.637376656633329
+            logs:
+            - date: 2000-01-23T04:56:07.000+00:00
+              comment: comment
+              id: 2
+              status: 7.061401241503109
+            - date: 2000-01-23T04:56:07.000+00:00
+              comment: comment
+              id: 2
+              status: 7.061401241503109
+          leavePeriodId: 6
+          approvals:
+          - date: 2000-01-23T04:56:07.000+00:00
+            substitutedApproverId: 2
+            approved: true
+            approverId: 5.637376656633329
+            comment: comment
+            id: 5
+          - date: 2000-01-23T04:56:07.000+00:00
+            substitutedApproverId: 2
+            approved: true
+            approverId: 5.637376656633329
+            comment: comment
+            id: 5
+          cancellationRequests:
+          - approved: true
+            rank: 3.616076749251911
+            comment: comment
+            id: 7
+            authorId: 9
+            creationDate: 2000-01-23T04:56:07.000+00:00
+            isActive: true
+            nextApproverId: ""
+          - approved: true
+            rank: 3.616076749251911
+            comment: comment
+            id: 7
+            authorId: 9
+            creationDate: 2000-01-23T04:56:07.000+00:00
+            isActive: true
+            nextApproverId: ""
+          id: 0
+          creationDate: 2000-01-23T04:56:07.000+00:00
+          isActive: true
+          nextApproverId: ""
+          status: 1.4658129805029452
+          cancellationDate: ""
+      properties:
+        data:
+          $ref: '#/components/schemas/LeaveRequest'
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    ImportsEntitlementsBatchImportResponse:
+      example:
+        lineErrors: "{}"
+        globalErrors: "{}"
+        successLinesCount: 0
+      properties:
+        successLinesCount:
+          type: integer
+        globalErrors:
+          type: object
+        lineErrors:
+          type: object
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    ImportsAbsenceBatchCreateResponse:
+      example:
+        data:
+          lineTotal: 6
+          expectedUpdateTotal: 2
+          totalStep: 5
+          creationTotal: 3
+          testNonBlockingErrorTotal: 7
+          importErrorTotal: 4
+          updateTotal: 2
+          currentStep: 9
+          testErrorTotal: 1
+          expectedCreationTotal: 5
+          report:
+            name: name
+            id: id
+            url: https://openapi-generator.tech
+          generatedAt: 2000-01-23T04:56:07.000+00:00
+          id: id
+          status: 0
+      properties:
+        data:
+          $ref: '#/components/schemas/ImportsAbsenceBatchCreateResponse_data'
+      type: object
+      x-konfig-is-used-in-successful-response: true
+    ImportsCreateAbsencesBatchResponse:
+      example:
+        summaryId: 51564472-08cc-4410-94cc-a2b67f77f980
+        hasError: false
+      properties:
+        summaryId:
+          example: 51564472-08cc-4410-94cc-a2b67f77f980
+          format: uuid
+          type: string
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-ImportsCreateAbsencesBatchResponse-properties-summaryId
+        hasError:
+          example: false
+          type: boolean
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-ImportsCreateAbsencesBatchResponse-properties-hasError
+      type: object
+      x-examples:
+        example-1:
+          summaryId: 51564472-08cc-4410-94cc-a2b67f77f980
+          hasError: false
+      x-konfig-is-used-in-successful-response: true
+    ImportsGetProgressResponse:
+      description: "0:not started, 1-99:in progress, 100:success, -1:error"
+      type: integer
+      x-konfig-is-used-in-successful-response: true
+    konfig-generated-schema-paths--figgo-api-public-services-v1.0-leaveEntitlementsImport-post-parameters-0-schema:
+      example: false
+      type: boolean
+      x-do-not-generate: true
+    konfig-generated-schema-paths--figgo-api-public-services-v1.0-leaveEntitlementsImport-post-parameters-1-schema:
+      example: false
+      type: boolean
+      x-do-not-generate: true
+    konfig-generated-schema-paths--timmi-absences-api-public-services-v1.0-leaveEntitlementsImport-post-parameters-0-schema:
+      example: false
+      type: boolean
+      x-do-not-generate: true
+    konfig-generated-schema-paths--timmi-absences-api-public-services-v1.0-leaveEntitlementsImport-post-parameters-1-schema:
+      example: false
+      type: boolean
+      x-do-not-generate: true
+    konfig-generated-schema-paths--figgo-api-public-services-v1.0-leaveEntitlementsReplace-post-parameters-0-schema:
+      example: false
+      type: boolean
+      x-do-not-generate: true
+    konfig-generated-schema-paths--figgo-api-public-services-v1.0-leaveEntitlementsReplace-post-parameters-1-schema:
+      example: false
+      type: boolean
+      x-do-not-generate: true
+    konfig-generated-schema-paths--timmi-absences-api-public-services-v1.0-leaveEntitlementsReplace-post-parameters-0-schema:
+      example: false
+      type: boolean
+      x-do-not-generate: true
+    konfig-generated-schema-paths--timmi-absences-api-public-services-v1.0-leaveEntitlementsReplace-post-parameters-1-schema:
+      example: false
+      type: boolean
+      x-do-not-generate: true
+    konfig-generated-schema-paths--api-v3-services-importLeavePeriods-post-parameters-0-schema:
+      example: csv
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-paths--api-v3-services-importLeavePeriods-post-parameters-1-schema:
+      example: false
+      type: boolean
+      x-do-not-generate: true
+    konfig-generated-schema-paths--api-v3-services-importLeavePeriods-post-parameters-3-schema:
+      example: import.csv
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-paths--timmi-absences-api-imports-v1.0-leavePeriods-post-parameters-2-schema:
+      example: import.csv
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-components-parameters-Timmi-Timesheet-v3_Paging-schema:
+      example: "100,0"
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-Leave-properties-cancellationUserId:
+      nullable: true
+      type: string
+      x-konfig-null-placeholder: true
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-ImportsReplaceEntitlementsRequest-properties-EntryTypes:
+      example: "AutoAccruals,ManualAccruals,Regularizations"
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-ImportsReplaceEntitlementsRequest1-properties-EntryTypes:
+      example: "AutoAccruals,ManualAccruals,Regularizations"
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-ImportsCreateAbsencesBatchResponse-properties-summaryId:
+      example: 51564472-08cc-4410-94cc-a2b67f77f980
+      type: string
+      x-do-not-generate: true
+    konfig-generated-schema-components-schemas-ImportsCreateAbsencesBatchResponse-properties-hasError:
+      example: false
+      type: boolean
+      x-do-not-generate: true
+    konfig-generated-schema-single-parameter-schema-get--api-v3-leaves:
+      properties:
+        paging:
+          example: "100,0"
+          type: string
+          x-konfig-original-example: "100,0"
+          x-konfig-generated-schema: konfig-generated-schema-components-parameters-Timmi-Timesheet-v3_Paging-schema
+        leaveAccountId:
+          type: string
+        leavePeriod.ownerId:
+          items:
+            description: "WARNING: Missing items property in array schema. Missing\
+              \ items property has been filled with this AnyType schema."
+          type: array
+        date:
+          type: string
+      required:
+      - date
+      - leavePeriod.ownerId
+      - paging
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - paging
+      - leaveAccountId
+      - leavePeriod.ownerId
+      - date
+    konfig-generated-schema-single-parameter-schema-delete--api-v3-leaves-leaveId:
+      properties: {}
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+    konfig-generated-schema-single-parameter-schema-get--api-v3-leaves-leaveId:
+      properties: {}
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+    konfig-generated-schema-single-parameter-schema-get--api-v3-leaveRequests:
+      properties: {}
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+    konfig-generated-schema-single-parameter-schema-delete--api-v3-leaveRequests-leaveRequestId:
+      properties: {}
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+    konfig-generated-schema-single-parameter-schema-get--api-v3-leaveRequests-leaveRequestId:
+      properties: {}
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+    konfig-generated-schema-single-parameter-schema-post--api-v3-leaveRequests-leaveRequestId-approvals:
+      properties:
+        approved:
+          type: boolean
+        comment: {}
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+    konfig-generated-schema-single-parameter-schema-post--figgo-api-public-services-v1.0-leaveEntitlementsImport:
+      properties:
+        strict:
+          default: false
+          example: false
+          type: boolean
+          x-konfig-original-example: false
+          x-konfig-generated-schema: konfig-generated-schema-paths--figgo-api-public-services-v1.0-leaveEntitlementsImport-post-parameters-0-schema
+        simulate:
+          default: false
+          example: false
+          type: boolean
+          x-konfig-original-example: false
+          x-konfig-generated-schema: konfig-generated-schema-paths--figgo-api-public-services-v1.0-leaveEntitlementsImport-post-parameters-1-schema
+        File:
+          type: string
+        Description:
+          description: Description of the entries generated by the import (visible
+            to users in the account details).
+          type: string
+        ReferenceDate:
+          description: |-
+            Reference date (text mode).
+            Respect the format: yyyy-MM-ddThh: mm: ss
+          format: date-time
+          type: string
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - strict
+      - simulate
+    konfig-generated-schema-single-parameter-schema-post--timmi-absences-api-public-services-v1.0-leaveEntitlementsImport:
+      properties:
+        strict:
+          default: false
+          example: false
+          type: boolean
+          x-konfig-original-example: false
+          x-konfig-generated-schema: konfig-generated-schema-paths--timmi-absences-api-public-services-v1.0-leaveEntitlementsImport-post-parameters-0-schema
+        simulate:
+          default: false
+          example: false
+          type: boolean
+          x-konfig-original-example: false
+          x-konfig-generated-schema: konfig-generated-schema-paths--timmi-absences-api-public-services-v1.0-leaveEntitlementsImport-post-parameters-1-schema
+        File:
+          type: string
+        Description:
+          description: Description of the entries generated by the import (visible
+            to users in the account details).
+          type: string
+        ReferenceDate:
+          description: |-
+            Reference date (text mode).
+            Respect the format: yyyy-MM-ddThh: mm: ss
+          format: date-time
+          type: string
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - strict
+      - simulate
+    konfig-generated-schema-single-parameter-schema-post--figgo-api-public-services-v1.0-leaveEntitlementsReplace:
+      properties:
+        strict:
+          default: false
+          example: false
+          type: boolean
+          x-konfig-original-example: false
+          x-konfig-generated-schema: konfig-generated-schema-paths--figgo-api-public-services-v1.0-leaveEntitlementsReplace-post-parameters-0-schema
+        simulate:
+          default: false
+          example: false
+          type: boolean
+          x-konfig-original-example: false
+          x-konfig-generated-schema: konfig-generated-schema-paths--figgo-api-public-services-v1.0-leaveEntitlementsReplace-post-parameters-1-schema
+        File:
+          type: string
+        Description:
+          description: Description of the entries generated by the import (visible
+            to users in the account details).
+          type: string
+        ReferenceDate:
+          description: |-
+            Reference date (text mode).
+            Respect the format: yyyy-MM-ddThh: mm: ss
+          format: date-time
+          type: string
+        EntryTypes:
+          default: "AutoAccruals,ManualAccruals,Regularizations"
+          description: |-
+            Types of entries to take into account, separated by commas, from the following list:
+            AutoAccruals,
+            ManualAccruals,
+            Regularisations,
+            EntitlementsImport,
+            Seniority,
+            Fractionnement,
+            TimeSavings,
+            Comp
+
+            By default: `AutoAccruals, ManualAccruals, Regularizations` which correspond to the main cases of acquisition (automatic acquisition, manual adjustments, regularisations).
+          example: "AutoAccruals,ManualAccruals,Regularizations"
+          type: string
+          x-konfig-original-example: "AutoAccruals,ManualAccruals,Regularizations"
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-ImportsReplaceEntitlementsRequest-properties-EntryTypes
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - strict
+      - simulate
+    konfig-generated-schema-single-parameter-schema-post--timmi-absences-api-public-services-v1.0-leaveEntitlementsReplace:
+      properties:
+        strict:
+          default: false
+          example: false
+          type: boolean
+          x-konfig-original-example: false
+          x-konfig-generated-schema: konfig-generated-schema-paths--timmi-absences-api-public-services-v1.0-leaveEntitlementsReplace-post-parameters-0-schema
+        simulate:
+          default: false
+          example: false
+          type: boolean
+          x-konfig-original-example: false
+          x-konfig-generated-schema: konfig-generated-schema-paths--timmi-absences-api-public-services-v1.0-leaveEntitlementsReplace-post-parameters-1-schema
+        File:
+          type: string
+        Description:
+          description: Description of the entries generated by the import (visible
+            to users in the account details).
+          type: string
+        ReferenceDate:
+          description: |-
+            Reference date (text mode).
+            Respect the format: yyyy-MM-ddThh: mm: ss
+          format: date-time
+          type: string
+        EntryTypes:
+          default: "AutoAccruals,ManualAccruals,Regularizations"
+          description: |-
+            Types of entries to take into account, separated by commas, from the following list:
+            AutoAccruals,
+            ManualAccruals,
+            Regularisations,
+            EntitlementsImport,
+            Seniority,
+            Fractionnement,
+            TimeSavings,
+            Comp
+
+            By default: `AutoAccruals, ManualAccruals, Regularizations` which correspond to the main cases of acquisition (automatic acquisition, manual adjustments, regularisations).
+          example: "AutoAccruals,ManualAccruals,Regularizations"
+          type: string
+          x-konfig-original-example: "AutoAccruals,ManualAccruals,Regularizations"
+          x-konfig-generated-schema: konfig-generated-schema-components-schemas-ImportsReplaceEntitlementsRequest1-properties-EntryTypes
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - strict
+      - simulate
+    konfig-generated-schema-single-parameter-schema-post--api-v3-services-importLeavePeriods:
+      properties:
+        type:
+          default: csv
+          enum:
+          - csv
+          example: csv
+          type: string
+          x-konfig-original-example: csv
+          x-konfig-generated-schema: konfig-generated-schema-paths--api-v3-services-importLeavePeriods-post-parameters-0-schema
+        create:
+          default: false
+          example: false
+          type: boolean
+          x-konfig-original-example: false
+          x-konfig-generated-schema: konfig-generated-schema-paths--api-v3-services-importLeavePeriods-post-parameters-1-schema
+        recredit:
+          type: boolean
+        originalFileName:
+          example: import.csv
+          type: string
+          x-konfig-original-example: import.csv
+          x-konfig-generated-schema: konfig-generated-schema-paths--api-v3-services-importLeavePeriods-post-parameters-3-schema
+        synchronize:
+          type: boolean
+        overrideLeaves:
+          type: boolean
+      required:
+      - originalFileName
+      - type
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - type
+      - create
+      - recredit
+      - originalFileName
+      - synchronize
+      - overrideLeaves
+    konfig-generated-schema-single-parameter-schema-post--timmi-absences-api-imports-v1.0-leavePeriods:
+      properties:
+        create:
+          type: boolean
+        recredit:
+          type: boolean
+        originalFileName:
+          default: import.csv
+          example: import.csv
+          type: string
+          x-konfig-original-example: import.csv
+          x-konfig-generated-schema: konfig-generated-schema-paths--timmi-absences-api-imports-v1.0-leavePeriods-post-parameters-2-schema
+        synchronize:
+          type: boolean
+        async:
+          type: boolean
+        files:
+          items:
+            type: string
+          type: array
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter:
+      - create
+      - recredit
+      - originalFileName
+      - synchronize
+      - async
+    konfig-generated-schema-single-parameter-schema-get--timmi-absences-api-imports-v1.0-leavePeriods-summaryId-progress:
+      properties: {}
+      type: object
+      x-do-not-generate: true
+      x-konfig-is-parameter: []
+    LeaveRequestsListResponse_data:
+      example:
+        count: 2
+        items:
+        - cancellationUserId: ""
+          leavePeriod:
+            confirmationDate: ""
+            leaves:
+            - null
+            - null
+            isConfirmed: true
+            id: 5.962133916683182
+            attachmentId: ""
+            ownerId: 5.637376656633329
+            logs:
+            - date: 2000-01-23T04:56:07.000+00:00
+              comment: comment
+              id: 2
+              status: 7.061401241503109
+            - date: 2000-01-23T04:56:07.000+00:00
+              comment: comment
+              id: 2
+              status: 7.061401241503109
+          leavePeriodId: 6
+          approvals:
+          - date: 2000-01-23T04:56:07.000+00:00
+            substitutedApproverId: 2
+            approved: true
+            approverId: 5.637376656633329
+            comment: comment
+            id: 5
+          - date: 2000-01-23T04:56:07.000+00:00
+            substitutedApproverId: 2
+            approved: true
+            approverId: 5.637376656633329
+            comment: comment
+            id: 5
+          cancellationRequests:
+          - approved: true
+            rank: 3.616076749251911
+            comment: comment
+            id: 7
+            authorId: 9
+            creationDate: 2000-01-23T04:56:07.000+00:00
+            isActive: true
+            nextApproverId: ""
+          - approved: true
+            rank: 3.616076749251911
+            comment: comment
+            id: 7
+            authorId: 9
+            creationDate: 2000-01-23T04:56:07.000+00:00
+            isActive: true
+            nextApproverId: ""
+          id: 0
+          creationDate: 2000-01-23T04:56:07.000+00:00
+          isActive: true
+          nextApproverId: ""
+          status: 1.4658129805029452
+          cancellationDate: ""
+        - cancellationUserId: ""
+          leavePeriod:
+            confirmationDate: ""
+            leaves:
+            - null
+            - null
+            isConfirmed: true
+            id: 5.962133916683182
+            attachmentId: ""
+            ownerId: 5.637376656633329
+            logs:
+            - date: 2000-01-23T04:56:07.000+00:00
+              comment: comment
+              id: 2
+              status: 7.061401241503109
+            - date: 2000-01-23T04:56:07.000+00:00
+              comment: comment
+              id: 2
+              status: 7.061401241503109
+          leavePeriodId: 6
+          approvals:
+          - date: 2000-01-23T04:56:07.000+00:00
+            substitutedApproverId: 2
+            approved: true
+            approverId: 5.637376656633329
+            comment: comment
+            id: 5
+          - date: 2000-01-23T04:56:07.000+00:00
+            substitutedApproverId: 2
+            approved: true
+            approverId: 5.637376656633329
+            comment: comment
+            id: 5
+          cancellationRequests:
+          - approved: true
+            rank: 3.616076749251911
+            comment: comment
+            id: 7
+            authorId: 9
+            creationDate: 2000-01-23T04:56:07.000+00:00
+            isActive: true
+            nextApproverId: ""
+          - approved: true
+            rank: 3.616076749251911
+            comment: comment
+            id: 7
+            authorId: 9
+            creationDate: 2000-01-23T04:56:07.000+00:00
+            isActive: true
+            nextApproverId: ""
+          id: 0
+          creationDate: 2000-01-23T04:56:07.000+00:00
+          isActive: true
+          nextApproverId: ""
+          status: 1.4658129805029452
+          cancellationDate: ""
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/LeaveRequest'
+          type: array
+        count:
+          type: integer
+      type: object
+    ImportsAbsenceBatchCreateResponse_data_report:
+      example:
+        name: name
+        id: id
+        url: https://openapi-generator.tech
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        url:
+          format: uri
+          type: string
+      type: object
+    ImportsAbsenceBatchCreateResponse_data:
+      example:
+        lineTotal: 6
+        expectedUpdateTotal: 2
+        totalStep: 5
+        creationTotal: 3
+        testNonBlockingErrorTotal: 7
+        importErrorTotal: 4
+        updateTotal: 2
+        currentStep: 9
+        testErrorTotal: 1
+        expectedCreationTotal: 5
+        report:
+          name: name
+          id: id
+          url: https://openapi-generator.tech
+        generatedAt: 2000-01-23T04:56:07.000+00:00
+        id: id
+        status: 0
+      properties:
+        id:
+          type: string
+        report:
+          $ref: '#/components/schemas/ImportsAbsenceBatchCreateResponse_data_report'
+        generatedAt:
+          format: date-time
+          type: string
+        status:
+          description: |
+            0 = Pending
+
+            10 = Started
+
+            20 = Finished
+
+            100 = Failed
+          enum:
+          - 0
+          - 10
+          - 20
+          - 100
+          type: integer
+        lineTotal:
+          type: integer
+        testErrorTotal:
+          type: integer
+        totalStep:
+          type: integer
+        expectedCreationTotal:
+          type: integer
+        expectedUpdateTotal:
+          type: integer
+        testNonBlockingErrorTotal:
+          type: integer
+        currentStep:
+          type: integer
+        creationTotal:
+          type: integer
+        updateTotal:
+          type: integer
+        importErrorTotal:
+          type: integer
+      type: object
+  securitySchemes:
+    Authorization:
+      description: "Header value must be equal to `lucca application={yourApiKey}`"
+      in: header
+      name: Authorization
+      type: apiKey
+      x-konfig-globally-required-security: true
+
